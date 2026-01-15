@@ -3,7 +3,7 @@ import json
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 
 # Konfigurasi
-API_KEY ="AIzaSyDptxjmiSlBpJfrnIiRbcKxOO-ZWJ3xz-I"
+API_KEY ="AIzaSyBrYaHxfT0QOIgqVwUfeheOxgHE3xYyvZQ"
 DB_PARAMS = "postgresql://array:123456@127.0.0.1:5435/catlovers_db"
 
 # Model
@@ -13,12 +13,12 @@ google_api_key=API_KEY)
 
 async def get_answer(user_query : str) -> str:
  
-    # 1. Ubah pertanyaan user jadi vektor
+    # Ubah pertanyaan user jadi vektor
     query_vector = await embeddings_model.aembed_query(user_query)
        
     query_vector_str = "[" + ",".join(map(str, query_vector)) + "]"
        
-    # 2. Cari di Postgres yang paling mirip (Similarity Search)
+    # (Similarity Search)
     conn = await asyncpg.connect(DB_PARAMS)
     try:
         
@@ -33,10 +33,10 @@ async def get_answer(user_query : str) -> str:
         context = "\n".join([r['content'] for r in results]) if results else "Tidak ada informasi spesifik."
         
     finally:
-        # Pastikan koneksi ditutup
+        # koneksi ditutup
         await conn.close()
 
-    # 3. Kirim ke LLM untuk dijawab secara manusiawi
+    # Kirim ke LLM untuk dijawab
     prompt = f"""
         Kamu adalah asisten ahli kucing. 
     

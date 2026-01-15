@@ -4,7 +4,7 @@ from psycopg2.extras import execute_values
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 # 1. Konfigurasi
-API_KEY = "AIzaSyDptxjmiSlBpJfrnIiRbcKxOO-ZWJ3xz-I"
+API_KEY = "AIzaSyBrYaHxfT0QOIgqVwUfeheOxgHE3xYyvZQ"
 DB_PARAMS = "postgresql://array:123456@127.0.0.1:5435/catlovers_db"
 
 embeddings_model = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004", google_api_key=API_KEY)
@@ -48,40 +48,838 @@ knowledge_data = [
 # Data terstruktur untuk Jenis Kucing (cat_breeds)
 breeds_data = [
     (
-      "Abyssinian",
-      "Tubuh ramping dan atletis dengan bulu pendek ticked (setiap helai multi-warna), telinga besar, mata almond berwarna hijau/emas, kaki panjang dan langsing. Penampilan elegan dan liar.",
-      "Ethiopia (dulunya Abyssinia)",
-      "Sangat aktif dan energik, sangat ingin tahu, suka memanjat tinggi, cerdas dan bisa dilatih, sosial dan suka bermain, tidak suka sendirian. Butuh banyak interaksi."
+      "Aegean",
+      "Bulu pendek hingga semi panjang, pola bicolor dan tricolor",
+      "Yunani",
+      "Ramah, sosial, dan suka air"
     ),
     (
-      "Russian Blue",
-      "Bulu abu-abu kebiruan pendek dan tebal dengan silver tips, undercoat dan topcoat sama panjang, mata hijau cemerlang, tubuh ramping dan elegan. Wajah terlihat seperti tersenyum.",
-      "Rusia",
-      "Pemalu dengan orang asing, loyal pada pemilik, tenang dan pendiam, cerdas dan observan, rutinitas oriented, sensitif pada perubahan. Memerlukan waktu untuk membuka diri."
-    ),
-    (
-      "Kucing Kampung",
-      "Penampilan sangat bervariasi, umumnya bertubuh sedang dengan bulu pendek. Berbagai warna dan pola. Sangat adaptif terhadap lingkungan tropis Indonesia dan Asia Tenggara.",
-      "Indonesia dan Asia Tenggara",
-      "Tangguh dan adaptif, cerdas dan mandiri, lincah dan aktif. Kepribadian beragam tergantung individu. Mudah beradaptasi dengan berbagai kondisi lingkungan."
-    ),
-    (
-      "American Shorthair",
-      "Tubuh medium hingga besar, berotot dan atletis, kepala bulat besar, mata bulat lebar, bulu pendek tebal. Berbagai warna dan pola, silver tabby paling populer.",
+      "American Bobtail",
+      "Ekor pendek alami, bulu pendek/semi panjang, tubuh semi cobby",
       "Amerika Serikat",
-      "Easy-going dan adaptif, tidak terlalu demanding, baik dengan anak-anak dan hewan lain, playful tapi tidak hyperaktif, mandiri namun affectionate. Kucing keluarga ideal."
+      "Penyayang, mudah beradaptasi, dan playful"
     ),
     (
-      "Norwegian Forest Cat",
-      "Kucing besar dengan bulu double coat panjang dan tebal tahan air, telinga besar dengan lynx tips, kaki besar dengan bulu di antara jari, ekor lebat. Dibuat untuk iklim dingin.",
-      "Norwegia",
-      "Ramah dan sosial, cerdas, atletis dan suka memanjat, mandiri tapi penyayang, sabar dengan anak-anak. Butuh waktu untuk mature (3-4 tahun)."
+      "American Curl",
+      "Telinga melengkung ke belakang, bulu pendek/panjang",
+      "Amerika Serikat",
+      "Ramah, penasaran, dan penyayang"
     ),
     (
-      "Birman",
-      "Bulu semi-panjang dengan color point pattern seperti Siamese, mata biru sapphire, 'sarung tangan' putih di keempat kaki yang simetris, tubuh medium berat.",
-      "Myanmar (Burma), dikembangkan di Prancis",
-      "Lembut dan penyayang, tidak terlalu vokal seperti Siamese, sosial dan baik dengan anak-anak, playful tapi tidak hyperaktif, suka dipeluk. Balance sempurna antara aktif dan kalem."
+      "American Wirehair",
+      "Bulu bertekstur kasar seperti kawat (rex)",
+      "Amerika Serikat",
+      "Santai, ramah, dan mudah beradaptasi"
+    ),
+    (
+      "Arabian Mau",
+      "Bulu pendek, tubuh medium hingga besar, warna putih, hitam, atau tabby coklat",
+      "Mesir",
+      "Setia, aktif, dan ramah dengan keluarga"
+    ),
+    (
+      "Ashera",
+      "Tubuh besar, bulu pendek dengan pola spotted, hybrid serval",
+      "Amerika Serikat",
+      "Eksotis, aktif, dan memerlukan perhatian khusus"
+    ),
+    (
+      "Balinese",
+      "Bulu semi panjang, tubuh oriental, pola colorpoint",
+      "Amerika Serikat",
+      "Vokal, sosial, dan penyayang"
+    ),
+    (
+      "Bombay",
+      "Bulu pendek hitam solid mengkilap, mata emas, menyerupai panther mini",
+      "Amerika Serikat",
+      "Ramah, sosial, dan suka perhatian"
+    ),
+    (
+      "British Longhair",
+      "Bulu semi panjang, tubuh medium hingga besar, wajah bulat",
+      "Inggris",
+      "Tenang, penyayang, dan mudah bergaul"
+    ),
+    (
+      "Burmese",
+      "Bulu pendek mengkilap, tubuh medium, mata emas",
+      "Myanmar (Burma)",
+      "Ramah, suka bermain, dan sangat penyayang"
+    ),
+    (
+      "Burmilla",
+      "Bulu pendek dengan shaded silver, mata hijau ekspresif",
+      "Inggris",
+      "Lembut, playful, dan sosial"
+    ),
+    (
+      "Chartreux",
+      "Bulu pendek biru solid tebal seperti wol, tubuh kokoh",
+      "Perancis",
+      "Tenang, pendiam, dan setia"
+    ),
+    (
+      "Chausie",
+      "Tubuh besar dan atletis, bulu pendek, pola ticked, hybrid kucing hutan",
+      "Perancis",
+      "Aktif, atletis, dan suka bermain"
+    ),
+    (
+      "Cornish Rex",
+      "Bulu keriting pendek (rex), tubuh ramping, telinga besar",
+      "Inggris",
+      "Energik, playful, dan suka berinteraksi"
+    ),
+    (
+      "Devon Rex",
+      "Bulu keriting rex, tubuh ramping, telinga sangat besar, wajah pixie-like",
+      "Inggris",
+      "Sangat sosial, playful, dan suka dipangku"
+    ),
+    (
+      "Egyptian Mau",
+      "Bulu pendek dengan pola spotted alami, tubuh medium hingga besar",
+      "Mesir",
+      "Aktif, setia, dan cepat berlari"
+    ),
+    (
+      "Exotic Shorthair",
+      "Bulu pendek tebal, wajah flat seperti Persia",
+      "Amerika Serikat",
+      "Tenang, penyayang, dan mudah dirawat"
+    ),
+    (
+      "Havana Brown",
+      "Bulu pendek coklat solid, tubuh medium, mata hijau",
+      "Inggris",
+      "Ramah, cerdas, dan suka interaksi"
+    ),
+    (
+      "Himalayan",
+      "Bulu panjang, wajah flat, pola colorpoint seperti Siamese",
+      "Inggris",
+      "Tenang, manis, dan butuh perawatan grooming rutin"
+    ),
+    (
+      "Japanese Bobtail",
+      "Ekor pendek seperti pompon, bulu pendek/panjang",
+      "Jepang",
+      "Aktif, vokal, dan ramah"
+    ),
+    (
+      "Korat",
+      "Bulu pendek biru-abu solid, tubuh semi cobby, mata hijau",
+      "Thailand",
+      "Tenang, setia, dan sensitif"
+    ),
+    (
+      "Manx",
+      "Tidak memiliki ekor atau ekor sangat pendek, bulu pendek",
+      "Inggris",
+      "Playful, cerdas, dan setia"
+    ),
+    (
+      "Nebelung",
+      "Bulu semi panjang biru solid, tubuh ramping",
+      "Amerika Serikat",
+      "Lembut, pemalu dengan orang asing, setia pada keluarga"
+    ),
+    (
+      "Ocicat",
+      "Bulu pendek dengan pola spotted seperti ocelot, tubuh besar",
+      "Amerika Serikat",
+      "Aktif, sosial, dan mudah dilatih"
+    ),
+    (
+      "Oriental Shorthair",
+      "Tubuh ramping oriental, bulu pendek, telinga besar, berbagai warna",
+      "Amerika Serikat",
+      "Vokal, energik, dan butuh perhatian"
+    ),
+    (
+      "Peterbald",
+      "Tubuh oriental, tidak berbulu (hairless) atau bulu tipis",
+      "Rusia",
+      "Ramah, energik, dan suka kehangatan"
+    ),
+    (
+      "Savannah",
+      "Tubuh sangat besar, bulu pendek spotted, hybrid serval, kaki panjang",
+      "Amerika Serikat",
+      "Sangat aktif, atletis, cerdas, dan suka bermain air"
+    ),
+    (
+      "Selkirk Rex",
+      "Bulu keriting tebal, tubuh medium hingga besar",
+      "Amerika Serikat",
+      "Penyayang, santai, dan playful"
+    ),
+    (
+      "Siberian",
+      "Bulu semi panjang tebal, tubuh besar dan kuat, tahan dingin",
+      "Rusia",
+      "Ramah, playful, dan hipoalergenik (rendah alergen)"
+    ),
+    (
+      "Singapura",
+      "Ukuran sangat kecil, bulu pendek ticked, mata besar",
+      "Singapura",
+      "Energik, penasaran, dan penyayang"
+    ),
+    (
+      "Snowshoe",
+      "Bulu pendek dengan pola colorpoint dan 'sepatu salju' putih di kaki",
+      "Amerika Serikat",
+      "Ramah, sosial, dan suka bermain"
+    ),
+    (
+      "Somali",
+      "Tubuh medium hingga besar, bulu panjang dengan pola ticked, mirip Abyssinian berbulu panjang",
+      "Amerika Serikat",
+      "Aktif, playful, dan cerdas"
+    ),
+    (
+      "Sokoke",
+      "Bulu pendek dengan pola marbled/spotted, tubuh ramping",
+      "Kenya",
+      "Aktif, cerdas, dan sosial"
+    ),
+    (
+      "Tonkinese",
+      "Perpaduan Siamese dan Burmese, tubuh medium, pola mink",
+      "Kanada",
+      "Sosial, playful, dan penyayang"
+    ),
+    (
+      "Toyger",
+      "Pola seperti harimau (striped), bulu pendek, tubuh medium",
+      "Amerika Serikat",
+      "Ramah, easy-going, dan suka bermain"
+    ),
+    (
+      "Turkish Van",
+      "Bulu semi panjang, pola van (putih dengan warna di kepala dan ekor)",
+      "Turki",
+      "Energik, suka air dan berenang, dan mandiri"
+    ),
+    (
+      "Alpine Lynx",
+      "Bulu pendek/semi panjang, tubuh medium, warna putih",
+      "Amerika Serikat",
+      "Ramah, tenang, dan adaptif"
+    ),
+    (
+      "American Keuda",
+      "Bulu pendek, tubuh medium, berbagai warna",
+      "Amerika Serikat",
+      "Mandiri, cerdas, dan tangguh"
+    ),
+    (
+      "American Longhair",
+      "Bulu panjang, tubuh standard, berbagai warna",
+      "Amerika Serikat",
+      "Ramah, santai, dan mudah bergaul"
+    ),
+    (
+      "American Polydactyl",
+      "Memiliki enam jari (polydactyl), bulu pendek/panjang, tubuh medium hingga besar",
+      "Amerika Serikat",
+      "Ramah, unik, dan mudah beradaptasi"
+    ),
+    (
+      "American Ringtail",
+      "Ekor melengkung seperti cincin, bulu semi panjang, tubuh medium hingga besar",
+      "Amerika Serikat",
+      "Penyayang, playful, dan sosial"
+    ),
+    (
+      "Anatolian",
+      "Bulu pendek, tubuh medium, warna alami",
+      "Turki",
+      "Energik, cerdas, dan suka berburu"
+    ),
+    (
+      "Aphrodite",
+      "Tubuh besar, bulu pendek/semi panjang, berbagai warna",
+      "Cyprus",
+      "Ramah, atletis, dan setia"
+    ),
+    (
+      "Asian",
+      "Bulu semi panjang, tubuh medium, pola self, smoke, tabby",
+      "Inggris & Amerika Serikat",
+      "Lembut, sosial, dan penyayang"
+    ),
+    (
+      "Australian Mist",
+      "Bulu pendek, pola spotted/classic tabby/ticked",
+      "Australia",
+      "Ramah, toleran, dan cocok untuk dalam rumah"
+    ),
+    (
+      "Australian Tiffanie",
+      "Bulu semi panjang, mayoritas putih",
+      "Australia",
+      "Penyayang, tenang, dan mudah bergaul"
+    ),
+    (
+      "Bahraini Dilmun",
+      "Bulu pendek, tubuh medium hingga besar, pola spotted/ticked",
+      "Saudi Arabia",
+      "Ramah, adaptif, dan sosial"
+    ),
+    (
+      "Bambino",
+      "Tubuh medium, tidak berbulu (hairless), kaki pendek",
+      "Italia",
+      "Energik, ramah, dan suka perhatian"
+    ),
+    (
+      "Bramble",
+      "Tubuh besar, bulu pendek, pola spotted/ticked/solid/colorpoint",
+      "Amerika Serikat",
+      "Aktif, cerdas, dan sosial"
+    ),
+    (
+      "Brazilian Shorthair",
+      "Bulu pendek, tubuh medium, berbagai warna",
+      "Brasil",
+      "Ramah, adaptif, dan mandiri"
+    ),
+    (
+      "California Spangled",
+      "Bulu pendek dengan pola spotted, berbagai warna",
+      "Amerika Serikat",
+      "Aktif, cerdas, dan sosial"
+    ),
+    (
+      "Cashmere",
+      "Bulu semi panjang, pola tabby/spotted/marbled",
+      "Eropa & USA",
+      "Aktif, playful, dan ramah"
+    ),
+    (
+      "Ceylon",
+      "Bulu pendek dengan pola ticked, mata kuning-hijau",
+      "Sri Lanka",
+      "Energik, cerdas, dan vokal"
+    ),
+    (
+      "Chantilly",
+      "Bulu semi panjang, warna hitam/biru/coklat/lilac",
+      "Amerika Serikat & Kanada",
+      "Lembut, loyal, dan suka perhatian"
+    ),
+    (
+      "Cheetoh",
+      "Tubuh besar, bulu pendek spotted, hybrid",
+      "Amerika Serikat",
+      "Ramah, energik, dan sosial"
+    ),
+    (
+      "Chinchilla Longhair",
+      "Bulu sangat panjang, warna chinchilla/perak",
+      "Inggris",
+      "Tenang, manis, dan elegan"
+    ),
+    (
+      "Chinese White",
+      "Bulu pendek/panjang, warna putih solid",
+      "RRC",
+      "Ramah, tenang, dan mudah bergaul"
+    ),
+    (
+      "Clippercat",
+      "Polydactyl (enam jari), bulu pendek/panjang, berbagai warna",
+      "New Zealand",
+      "Ramah, unik, dan adaptif"
+    ),
+    (
+      "Colourpoint Shorthair",
+      "Tubuh medium, bulu pendek, pola colorpoint",
+      "Amerika Serikat",
+      "Vokal, sosial, dan penyayang"
+    ),
+    (
+      "Curly Tail",
+      "Ekor melengkung, bulu pendek/medium/panjang",
+      "Tidak diketahui",
+      "Ramah, playful, dan unik"
+    ),
+    (
+      "Cymric",
+      "Tidak berekor atau ekor pendek, bulu panjang",
+      "Inggris",
+      "Playful, cerdas, dan setia"
+    ),
+    (
+      "Desert Lynx",
+      "Tubuh medium hingga besar, bulu pendek/semi panjang, pola spotted",
+      "Amerika Serikat",
+      "Ramah, aktif, dan cerdas"
+    ),
+    (
+      "Domestic Longhair",
+      "Bulu medium hingga panjang, tubuh standard, berbagai warna",
+      "Tidak diketahui",
+      "Bervariasi, umumnya ramah dan adaptif"
+    ),
+    (
+      "Domestic Shorthair",
+      "Bulu pendek, tubuh standard, berbagai warna",
+      "Tidak diketahui",
+      "Bervariasi, umumnya ramah dan mandiri"
+    ),
+    (
+      "Don Sphynx",
+      "Tubuh medium, tidak berbulu (hairless)",
+      "Rusia",
+      "Ramah, sosial, dan hangat"
+    ),
+    (
+      "Dragon Li",
+      "Bulu pendek golden brown, pola striped tabby",
+      "RRC (Cina)",
+      "Ramah, cerdas, dan loyal"
+    ),
+    (
+      "Dwelf",
+      "Tubuh kerdil (dwarf), tidak berbulu (hairless)",
+      "Amerika Serikat",
+      "Energik, playful, dan penyayang"
+    ),
+    (
+      "Elf",
+      "Tubuh medium hingga besar, tidak berbulu, telinga melengkung",
+      "Amerika Serikat",
+      "Ramah, sosial, dan energik"
+    ),
+    (
+      "European Shorthair",
+      "Bulu pendek, tubuh medium hingga besar",
+      "Swedia & Italia",
+      "Mandiri, ramah, dan adaptif"
+    ),
+    (
+      "Exotic Fold",
+      "Tubuh cobby, bulu pendek/panjang, telinga melipat",
+      "Kanada",
+      "Tenang, penyayang, dan manis"
+    ),
+    (
+      "Exotic Longhair",
+      "Tubuh cobby, bulu panjang, wajah flat",
+      "Amerika Serikat",
+      "Tenang, manis, dan penyayang"
+    ),
+    (
+      "Foreign White",
+      "Tubuh oriental, bulu pendek, warna putih solid",
+      "Inggris",
+      "Vokal, energik, dan sosial"
+    ),
+    (
+      "Genetta",
+      "Tubuh standard, bulu pendek, pola brown spotted tabby",
+      "Amerika Serikat",
+      "Playful, energik, dan ramah"
+    ),
+    (
+      "German Rex",
+      "Bulu keriting (rex), tubuh medium",
+      "Jerman",
+      "Ramah, playful, dan penyayang"
+    ),
+    (
+      "Habari",
+      "Tubuh besar, bulu pendek spotted, hybrid",
+      "Asia",
+      "Aktif, cerdas, dan eksotis"
+    ),
+    (
+      "Highland Fold",
+      'Tubuh cobby, bulu medium/panjang, telinga melipat',
+      'Skotlandia',
+      'Tenang, manis, dan penyayang'
+    ),
+    (
+      "Highlander Shorthair",
+      'Tubuh medium hingga besar, bulu pendek, pola spotted/solid',
+      'Amerika Serikat',
+      'Aktif, ramah, dan playful'
+    ),
+    (
+      "Highlander Longhair",
+      'Tubuh medium hingga besar, bulu panjang, pola spotted/solid',
+      'Amerika Serikat',
+      'Ramah, energik, dan sosial'
+    ),
+    (
+      "Jaguarundi Curl",
+      'Tubuh medium hingga besar, bulu pendek, pola solid/ticked/spotted',
+      'Amerika Utara',
+      'Aktif, cerdas, dan unik'
+    ),
+    (
+      "Jambi",
+      'Tubuh cobby dan stocky, bulu pendek, warna golden dengan spot gelap',
+      'Asia',
+      'Ramah, tenang, dan eksotis'
+    ),
+    (
+      "Javanese",
+      'Tubuh oriental medium, bulu pendek/semi panjang',
+      'Amerika Serikat',
+      'Vokal, sosial, dan energik'
+    ),
+    (
+      "Jungala",
+      'Tubuh besar, bulu pendek, pola classic tabby',
+      'Amerika Serikat',
+      'Aktif, cerdas, dan playful'
+    ),
+    (
+      "Jungle",
+      'Tubuh besar, bulu pendek, warna sandy brown/reddish/gray, hybrid',
+      'Asia Selatan dan Tengah',
+      'Wild, energik, dan butuh perhatian khusus'
+    ),
+    (
+      "Junglebob",
+      'Tubuh medium hingga besar, bulu pendek/medium/panjang, pola spotted',
+      'Amerika Serikat',
+      'Aktif, ramah, dan unik'
+    ),
+    (
+      "Kanaani",
+      'Tubuh medium hingga besar, bulu pendek, pola spotted',
+      'Jerman & Jerusalem',
+      'Energik, cerdas, dan mandiri'
+    ),
+    (
+      "Karel Bobtail",
+      'Tubuh medium, ekor pendek, bulu pendek/semi panjang, pola spotted tabby',
+      'Republik Karelia, Rusia',
+      'Ramah, playful, dan adaptif'
+    ),
+    (
+      "Kashmir",
+      'Tubuh medium, bulu panjang, warna lilac/coklat',
+      'Kanada & Amerika Serikat',
+      'Tenang, penyayang, dan manis'
+    ),
+    (
+      "Khao Manee",
+      'Bulu pendek, warna putih, mata berlian (heterochromia)',
+      'Thailand',
+      'Sosial, vokal, dan penyayang'
+    ),
+    (
+      "Kinkalow",
+      'Tubuh kerdil (dwarf), bulu pendek/semi panjang, telinga melengkung',
+      'Amerika Serikat',
+      'Playful, energik, dan ramah'
+    ),
+    (
+      "Kohana",
+      'Tubuh oriental, tidak berbulu (hairless)',
+      'Hawaii (USA)',
+      'Energik, sosial, dan hangat'
+    ),
+    (
+      "Kurilian Bobtail",
+      'Tubuh semi cobby, ekor pendek, bulu pendek/panjang',
+      'Pulau Kuril, Rusia',
+      'Ramah, cerdas, dan suka air'
+    ),
+    (
+      "Lambkin",
+      'Tubuh kerdil (dwarf), bulu keriting pendek/panjang',
+      'Amerika Serikat',
+      'Penyayang, playful, dan manis'
+    ),
+    (
+      "LaPerm",
+      'Bulu keriting (rex) pendek/panjang, tubuh kecil hingga moderate',
+      'Amerika Serikat',
+      'Ramah, penyayang, dan sosial'
+    ),
+    (
+      "Mandalay",
+      'Tubuh medium, bulu pendek, warna ebony/chocolate/lavender/blue',
+      'Selandia Baru',
+      'Ramah, sosial, dan penyayang'
+    ),
+    (
+      "Meerkat",
+      'Tubuh medium, bulu pendek',
+      'Amerika Utara',
+      'Ramah, playful, dan unik'
+    ),
+    (
+      "Mekong Bobtail",
+      'Tubuh medium, ekor pendek, bulu pendek, pola colorpoint',
+      'Iran, Irak, RRC, Mongolia, Laos, Myanmar, Vietnam',
+      'Ramah, loyal, dan vokal'
+    ),
+    (
+      "Minskin",
+      'Tubuh semi cobby, bulu pendek/hairless, kaki pendek',
+      'Amerika Serikat',
+      'Energik, ramah, dan sosial'
+    ),
+    (
+      "Mohave Bobs",
+      'Tubuh medium, bulu pendek/semi panjang',
+      'Amerika Serikat',
+      'Ramah, playful, dan adaptif'
+    ),
+    (
+      "Mojave Spotted",
+      'Tubuh medium hingga besar, bulu pendek, pola spotted tabby',
+      'Mojave',
+      'Aktif, cerdas, dan eksotis'
+    ),
+    (
+      "Mokave",
+      'Tubuh besar, bulu pendek, pola spotted',
+      'Amerika Serikat',
+      'Energik, playful, dan ramah'
+    ),
+    (
+      "Napoleon",
+      'Tubuh cobby, bulu pendek/panjang, kaki pendek',
+      'Amerika Serikat',
+      'Manis, penyayang, dan playful'
+    ),
+    (
+      "Nepalayan",
+      'Tubuh medium, bulu pendek/panjang, polydactyl',
+      'New Zealand',
+      'Ramah, unik, dan adaptif'
+    ),
+    (
+      "Neva Masquerade",
+      'Tubuh medium, bulu panjang, pola colorpoint',
+      'Rusia',
+      'Ramah, playful, dan tahan dingin'
+    ),
+    (
+      "New Zealand",
+      'Tubuh medium, bulu pendek/panjang, berbagai warna',
+      'New Zealand',
+      'Ramah, mandiri, dan adaptif'
+    ),
+    (
+      "Ojos Azules",
+      'Tubuh medium, bulu pendek, mata biru',
+      'Amerika Serikat',
+      'Ramah, lembut, dan unik'
+    ),
+    (
+      "Oriental Bicolour",
+      'Tubuh oriental, bulu pendek/panjang, pola bicolour',
+      'Amerika Serikat',
+      'Vokal, energik, dan sosial'
+    ),
+    (
+      "Oriental Longhair",
+      'Tubuh oriental, bulu panjang/semi panjang, berbagai warna',
+      'Amerika Serikat',
+      'Vokal, sosial, dan energik'
+    ),
+    (
+      "Owyhee Bobs",
+      'Tubuh medium hingga besar, bulu pendek/panjang, ekor pendek',
+      'Amerika Serikat',
+      'Ramah, playful, dan adaptif'
+    ),
+    (
+      "Pantherette",
+      'Tubuh besar, bulu pendek, pola black tabby, hybrid',
+      'Amerika Serikat',
+      'Aktif, eksotis, dan cerdas'
+    ),
+    (
+      "Pixiebob Longhair",
+      'Tubuh medium hingga besar, bulu panjang, pola brown spotted tabby',
+      'Amerika Serikat',
+      'Ramah, loyal, dan dog-like'
+    ),
+    (
+      "Pixiebob Shorthair",
+      'Tubuh medium hingga besar, bulu pendek, pola brown spotted tabby',
+      'Amerika Serikat',
+      'Ramah, cerdas, dan loyal'
+    ),
+    (
+      "Puppykat",
+      'Tubuh medium hingga besar, bulu pendek',
+      'Amerika Serikat',
+      'Ramah, playful, dan seperti anjing'
+    ),
+    (
+      "Ragamuffin",
+      'Tubuh cobby, bulu panjang, berbagai warna',
+      'Amerika Serikat',
+      'Sangat penyayang, tenang, dan docile'
+    ),
+    (
+      "Russian Shorthair",
+      'Tubuh medium, bulu pendek, berbagai warna',
+      'Rusia',
+      'Tenang, cerdas, dan mandiri'
+    ),
+    (
+      "Russian White, Black, Tabby",
+      'Tubuh medium, bulu pendek, warna putih/hitam/tabby',
+      'Australia',
+      'Ramah, cerdas, dan penyayang'
+    ),
+    (
+      "Safari",
+      'Tubuh besar, bulu pendek, pola spotted, hybrid',
+      'Amerika Serikat',
+      'Aktif, eksotis, dan energik'
+    ),
+    (
+      "Scottish Straight Longhair",
+      'Tubuh medium, bulu panjang, telinga tegak',
+      'Skotlandia',
+      'Ramah, tenang, dan penyayang'
+    ),
+    (
+      "Scottish Straight Shorthair",
+      'Tubuh medium, bulu pendek, telinga tegak',
+      'Skotlandia',
+      'Ramah, mudah bergaul, dan playful'
+    ),
+    (
+      "Serengeti",
+      'Tubuh besar, bulu pendek, pola spotted',
+      'Amerika Serikat',
+      'Aktif, vokal, dan energik'
+    ),
+    (
+      "Seychellois",
+      'Tubuh oriental, bulu pendek/panjang, warna putih dengan tail hitam',
+      'Inggris',
+      'Vokal, sosial, dan energik'
+    ),
+    (
+      "Sibella",
+      'Tubuh medium hingga besar, bulu semi panjang, berbagai warna plus putih',
+      'Amerika Serikat',
+      'Tenang, penyayang, dan docile'
+    ),
+    (
+      "Skookum",
+      'Tubuh moderate, bulu pendek/keriting, kaki pendek',
+      'USA, Europe, New Zealand, Australia',
+      'Playful, ramah, dan energik'
+    ),
+    (
+      "Snow-Bobs",
+      'Tubuh medium hingga besar, bulu pendek, pola colorpoint snow',
+      'Amerika Serikat',
+      'Ramah, tenang, dan penyayang'
+    ),
+    (
+      "Snowshoe",
+      'Tubuh medium hingga besar, bulu pendek, pola colorpoint dengan kaki putih',
+      'Amerika Serikat',
+      'Vokal, sosial, dan ramah'
+    ),
+    (
+      "Sokoke",
+      'Tubuh medium, bulu pendek, pola classic tabby dengan ticking',
+      'Kenya',
+      'Aktif, sosial, dan cerdas'
+    ),
+    (
+      "Tasman Manx",
+      'Tubuh medium, bulu pendek/panjang, tidak berekor',
+      'Australia & New Zealand',
+      'Playful, ramah, dan adaptif'
+    ),
+    (
+      "Teacup",
+      'Tubuh sangat kecil (dwarf), bulu pendek/panjang',
+      'Eropa & USA',
+      'Manis, kecil, dan butuh perawatan khusus'
+    ),
+    (
+      "Templecat",
+      'Tubuh medium, bulu pendek, pola colorpoint',
+      'Birma',
+      'Ramah, tenang, dan penyayang'
+    ),
+    (
+      "Tennessee Rex",
+      'Tubuh medium hingga besar, bulu keriting (rex)',
+      'Amerika Serikat',
+      'Ramah, playful, dan energik'
+    ),
+    (
+      "Thai",
+      "Tubuh medium, bulu pendek, pola colorpoint",
+      'Thailand',
+      'Vokal, sosial, dan penyayang'
+    ),
+    (
+      "Thai Lilac",
+      'Tubuh medium, bulu pendek, warna lilac',
+      'Eropa',
+      'Ramah, lembut, dan tenang'
+    ),
+    (
+      "Thai Point",
+      'Tubuh medium, bulu pendek, pola blue/lilac point',
+      'Thailand',
+      'Vokal, sosial, dan ramah'
+    ),
+    (
+      "Tibetan",
+      'Tubuh medium, bulu semi panjang, pola colourpoint/mink/white/solid',
+      'Belanda',
+      'Tenang, penyayang, dan lembut'
+    ),
+    (
+      "ToyBob",
+      'Tubuh mini, bulu pendek, pola colorpoint',
+      'Rusia',
+      'Manis, kecil, dan penyayang'
+    ),
+    (
+      "Turkish Vankedisi",
+      'Tubuh medium, bulu semi panjang, warna putih',
+      'Turki',
+      'Energik, suka air, dan mandiri'
+    ),
+    (
+      "Twisty",
+      'Tubuh standard, bulu pendek/semi panjang, kaki pendek',
+      'Amerika Serikat, Australia, Eropa',
+      'Ramah, unik, dan adaptif'
+    ),
+    (
+      "Ukrainian Levkoy",
+      'Tubuh medium, tidak berbulu (hairless), telinga melipat',
+      'Ukraina',
+      'Ramah, sosial, dan unik'
+    ),
+    (
+      "Ural Rex",
+      'Tubuh medium, bulu keriting pendek/medium, warna chocolate/black & white tabby/brown',
+      'Rusia',
+      'Ramah, playful, dan adaptif'
+    ),
+    (
+      "York Chocolate",
+      'Tubuh medium hingga besar, bulu semi panjang, warna chocolate/lavender/white/bicolour',
+      'Amerika Serikat',
+      'Ramah, tenang, dan penyayang'
     )
 ]
 
@@ -119,7 +917,7 @@ def insert_all_data():
         cur = conn.cursor()
         print("🚀 Menghubungkan ke database...")
 
-        # A. Ingest ke cat_knowledge (RAG)
+        # Ingest ke cat_knowledge (RAG)
         print("Memasukkan data pengetahuan (vektor)...")
         for item in knowledge_data:
             vector = embeddings_model.embed_query(item['text'])
@@ -128,14 +926,14 @@ def insert_all_data():
                 (item['text'], item['cat'], vector)
             )
 
-        # B. Ingest ke cat_breeds (Data Master)
+        # Ingest ke cat_breeds (Data Master)
         print("Memasukkan data jenis kucing...")
         execute_values(cur, 
             "INSERT INTO cat_breeds (name, description, origin, temperament) VALUES %s", 
             breeds_data
         )
 
-        # C. Ingest ke cat_diseases (Data Master)
+        # Ingest ke cat_diseases (Data Master)
         print("Memasukkan data penyakit...")
         execute_values(cur, 
             "INSERT INTO cat_diseases (name, symptoms, treatment_suggestion, danger_level) VALUES %s", 

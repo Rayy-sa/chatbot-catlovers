@@ -8,7 +8,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-TOKEN = "8401369464:AAEbjoBYd8G3SokWlbaOim3EdRX03zxBlQE"
+TOKEN = "8571464804:AAH9qW7JH8moz86kkv-i-BDlY8niXRnLPRY"
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE)-> None:
     """Handle incoming text messages from users."""
